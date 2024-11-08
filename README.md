@@ -1,5 +1,5 @@
 [![CNCF Badge](https://img.shields.io/badge/CNCF%20Landscape-5699C6?style=flat-square&color=5699C6)](https://landscape.cncf.io/?item=app-definition-and-development--application-definition-image-build--cyclops)
-[![Docker Pulls](https://img.shields.io/docker/pulls/cyclopsui/cyclops-ui?style=flat-square&logo=docker&color=%230db7ed)](https://hub.docker.com/repository/docker/cyclopsui/cyclops-ui/general)
+[![Docker Pulls](https://img.shields.io/docker/pulls/cyclopsui/cyclops-ctrl?style=flat-square&logo=docker&color=%230db7ed)](https://hub.docker.com/repository/docker/cyclopsui/cyclops-ctrl/general)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cyclops-ui/cyclops/cyclops-ctrl?style=flat-square)](https://goreportcard.com/report/github.com/cyclops-ui/cyclops/cyclops-ctrl)
 [![GitHub Actions CI](https://img.shields.io/github/actions/workflow/status/cyclops-ui/cyclops/ci.yml?style=flat-square&logo=github&logoColor=white&label=cyclops%20build)](https://github.com/cyclops-ui/cyclops/actions/workflows/ci.yml)
 [![GitHub Actions web](https://img.shields.io/github/actions/workflow/status/cyclops-ui/cyclops/web.yaml?style=flat-square&logo=github&logoColor=white&label=GitHub%20pages%20build)](https://github.com/cyclops-ui/cyclops/actions/workflows/web.yaml)
@@ -105,3 +105,9 @@ Start your contributing journey at our [CONTRIBUTING.md](./CONTRIBUTING.md) and 
 - **Support for Kustomize** -> currently, only Helm is supported for creating templates
 - **`cyctl` for Windows** -> Chocolatey
 - **Customizable Module details page** -> create custom views of resources that your module uses
+
+## 👁️ Share your feedback
+
+**Are you using Cyclops at your company?** We'd love to hear directly from you about how you're using (or planning to use) Cyclops! Chat with us for **30 minutes** about your use case and we'll send you a **50$ Amazon Gift Card** as a thank-you for your time. Please fill in this [form](https://forms.gle/Phu3R1i2gTBM1iAm8), and we will get in touch with you!
+
+Your input will directly influence the direction of Cyclops, and we appreciate every bit of feedback. Thank you for helping us build something great! 🧡

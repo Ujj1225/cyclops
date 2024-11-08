@@ -50,7 +50,7 @@ type ModuleReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
-	templatesRepo    *templaterepo.Repo
+	templatesRepo    templaterepo.ITemplateRepo
 	kubernetesClient k8sclient.IKubernetesClient
 	renderer         *render.Renderer
 
@@ -62,7 +62,7 @@ type ModuleReconciler struct {
 func NewModuleReconciler(
 	client client.Client,
 	scheme *runtime.Scheme,
-	templatesRepo *templaterepo.Repo,
+	templatesRepo templaterepo.ITemplateRepo,
 	kubernetesClient k8sclient.IKubernetesClient,
 	renderer *render.Renderer,
 	telemetryClient telemetry.Client,
@@ -176,6 +176,16 @@ func (r *ModuleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 	if len(installErrors) != 0 {
 		r.monitor.OnFailedReconciliation()
+
+		r.logger.Info("error applying resources",
+			"module namespaced name",
+			module.Name,
+			"number of install errors",
+			len(installErrors),
+			"install errors",
+			installErrors,
+		)
+
 		return ctrl.Result{}, r.setStatus(
 			ctx,
 			module,
@@ -305,15 +315,6 @@ func (r *ModuleReconciler) generateResources(
 		childrenGVRs = append(childrenGVRs, gvr)
 
 		if err := kClient.CreateDynamic(gvr, &obj, module.Spec.TargetNamespace); err != nil {
-			r.logger.Error(err, "could not apply resource",
-				"module namespaced name",
-				module.Name,
-				"gvk",
-				obj.GroupVersionKind().String(),
-				"resource namespaced name",
-				fmt.Sprintf("%s/%s", obj.GetNamespace(), obj.GetName()),
-			)
-
 			installErrors = append(installErrors, fmt.Sprintf(
 				"%v%v/%v %v/%v failed to apply: %v",
 				obj.GroupVersionKind().Group,

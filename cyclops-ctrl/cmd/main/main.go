@@ -21,6 +21,7 @@ import (
 
 	"github.com/cyclops-ui/cyclops/cyclops-ctrl/internal/auth"
 	"github.com/cyclops-ui/cyclops/cyclops-ctrl/internal/handler"
+	"github.com/cyclops-ui/cyclops/cyclops-ctrl/internal/integrations/helm"
 	"github.com/cyclops-ui/cyclops/cyclops-ctrl/internal/modulecontroller"
 	"github.com/cyclops-ui/cyclops/cyclops-ctrl/internal/prometheus"
 	"github.com/cyclops-ui/cyclops/cyclops-ctrl/internal/telemetry"
@@ -70,7 +71,16 @@ func main() {
 	)
 	telemetryClient.InstanceStart()
 
-	k8sClient, err := k8sclient.New()
+	watchNamespace := getWatchNamespace()
+	helmWatchNamespace := getHelmWatchNamespace()
+	moduleTargetNamespace := getModuleTargetNamespace()
+
+	k8sClient, err := k8sclient.New(
+		watchNamespace,
+		helmWatchNamespace,
+		moduleTargetNamespace,
+		zap.New(zap.UseFlagOptions(&opts)),
+	)
 	if err != nil {
 		fmt.Println("error bootstrapping Kubernetes client", err)
 		panic(err)
@@ -90,7 +100,9 @@ func main() {
 
 	prometheus.StartCacheMetricsUpdater(&monitor, templatesRepo.ReturnCache(), 10*time.Second, setupLog)
 
-	handler, err := handler.New(templatesRepo, k8sClient, renderer, telemetryClient, monitor)
+	helmReleaseClient := helm.NewReleaseClient(helmWatchNamespace)
+
+	handler, err := handler.New(templatesRepo, k8sClient, helmReleaseClient, renderer, moduleTargetNamespace, telemetryClient, monitor)
 	if err != nil {
 		panic(err)
 	}
@@ -110,7 +122,7 @@ func main() {
 		}),
 		Cache: ctrlCache.Options{
 			DefaultNamespaces: map[string]ctrlCache.Config{
-				getWatchNamespace("WATCH_NAMESPACE"): {},
+				watchNamespace: {},
 			},
 		},
 	})
@@ -161,10 +173,22 @@ func getEnvBool(key string) bool {
 	return b
 }
 
-func getWatchNamespace(key string) string {
-	value := os.Getenv(key)
+func getWatchNamespace() string {
+	value := os.Getenv("WATCH_NAMESPACE")
 	if value == "" {
 		return "cyclops"
+	}
+	return value
+}
+
+func getModuleTargetNamespace() string {
+	return os.Getenv("MODULE_TARGET_NAMESPACE")
+}
+
+func getHelmWatchNamespace() string {
+	value := os.Getenv("WATCH_NAMESPACE_HELM")
+	if value == "" {
+		return ""
 	}
 	return value
 }
